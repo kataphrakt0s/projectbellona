@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://biuqh5v8inpkb"]
+
+[ext_resource type="PackedScene" uid="uid://b7iw14nobde70" path="res://World/Levels/test_level.tscn" id="1_8a836"]
+[ext_resource type="PackedScene" uid="uid://ckbwj7ku1orp3" path="res://World/hud.tscn" id="1_62w18"]
+[ext_resource type="Script" uid="uid://b7qpnpoeab8fj" path="res://World/camera_2d.gd" id="2_j8job"]
+
+[node name="World" type="Node2D"]
+
+[node name="Level" type="Node2D" parent="."]
+
+[node name="TestLevel" parent="Level" instance=ExtResource("1_8a836")]
+
+[node name="Structures" type="Node2D" parent="."]
+
+[node name="Units" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+zoom = Vector2(3, 3)
+script = ExtResource("2_j8job")
+
+[node name="HUD" parent="." instance=ExtResource("1_62w18")]
