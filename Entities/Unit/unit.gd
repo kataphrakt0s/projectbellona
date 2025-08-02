@@ -1,4 +1,4 @@
-extends Node2D
+class_name Unit extends Area2D
 
 @export var team: EntityManager.TEAMS = EntityManager.TEAMS.NEUTRAL
 @export var unit_type: EntityManager.UNITTYPES = EntityManager.UNITTYPES.BASIC
@@ -7,6 +7,8 @@ extends Node2D
 
 
 func _ready() -> void:
+	self.add_to_group("Units")
+	
 	# Load correct unit texture based on unit team and type
 	unit_sprite.texture = load(
 		"res://Entities/Unit/Assets/{team}/{team}_{type}.tres".format(
@@ -16,7 +18,7 @@ func _ready() -> void:
 
 # Helpers
 func get_enum_name(enum_dict: Dictionary, value: int) -> String:
-	for name in enum_dict.keys():
-		if enum_dict[name] == value:
-			return name
+	for enum_name in enum_dict.keys():
+		if enum_dict[enum_name] == value:
+			return enum_name
 	return "UNKNOWN"

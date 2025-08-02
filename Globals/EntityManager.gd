@@ -15,3 +15,9 @@ enum UNITTYPES {
 	PLANE,
 	BOAT
 }
+
+
+var current_selection: Unit = null
+
+func _ready() -> void:
+	pass

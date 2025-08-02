@@ -1,11 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8ak1u0lbnfx7"]
+[gd_scene load_steps=4 format=3 uid="uid://c8ak1u0lbnfx7"]
 
 [ext_resource type="Script" uid="uid://dy7i36or3bi4c" path="res://Entities/Cursor/cursor.gd" id="1_h1whw"]
 [ext_resource type="Texture2D" uid="uid://drf7t8hg6i5bi" path="res://Entities/Cursor/cursor_texture.tres" id="2_1rdry"]
 
-[node name="Cursor" type="Node2D"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_h1whw"]
+radius = 8.0
+
+[node name="Cursor" type="Area2D"]
 script = ExtResource("1_h1whw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_1rdry")
 centered = false
+
+[node name="CursorCollider" type="CollisionShape2D" parent="."]
+position = Vector2(9, 9)
+shape = SubResource("CircleShape2D_h1whw")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="area_exited" from="." to="." method="_on_area_exited"]
