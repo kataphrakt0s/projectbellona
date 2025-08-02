@@ -1,9 +1,10 @@
-[gd_scene load_steps=15 format=3 uid="uid://biuqh5v8inpkb"]
+[gd_scene load_steps=16 format=3 uid="uid://biuqh5v8inpkb"]
 
 [ext_resource type="Script" uid="uid://ck05i5cxi82uj" path="res://World/world.gd" id="1_3f78f"]
 [ext_resource type="PackedScene" uid="uid://b7iw14nobde70" path="res://World/Levels/test_level.tscn" id="1_8a836"]
 [ext_resource type="PackedScene" uid="uid://ckbwj7ku1orp3" path="res://World/hud.tscn" id="1_62w18"]
 [ext_resource type="Script" uid="uid://b7qpnpoeab8fj" path="res://World/camera_2d.gd" id="2_j8job"]
+[ext_resource type="PackedScene" uid="uid://d250qjnmylysl" path="res://Entities/Unit/unit.tscn" id="3_eidgh"]
 [ext_resource type="PackedScene" uid="uid://c8ak1u0lbnfx7" path="res://Entities/Cursor/cursor.tscn" id="4_bkhv4"]
 [ext_resource type="Script" uid="uid://un3ghtcemwg5" path="res://World/a_star_grid_2d.gd" id="5_k8do8"]
 [ext_resource type="Texture2D" uid="uid://7kqv3ijqwk7p" path="res://Assets/tilemap.png" id="7_yf0ba"]
@@ -46,6 +47,9 @@ script = ExtResource("1_3f78f")
 [node name="Structures" type="Node2D" parent="."]
 
 [node name="Units" type="Node2D" parent="."]
+
+[node name="Unit" parent="Units" instance=ExtResource("3_eidgh")]
+position = Vector2(64, 48)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0

@@ -35,7 +35,7 @@ func _ready():
 
 
 func _unhandled_input(event):
-	if event.is_action_pressed("preview_path"):  # "preview_path" = X key in Input Map
+	if event.is_action_pressed("preview_path"):
 		preview_active = true
 
 	if event is InputEventMouseButton and event.pressed and preview_active:
