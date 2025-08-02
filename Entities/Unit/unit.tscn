@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://d250qjnmylysl"]
+[gd_scene load_steps=4 format=3 uid="uid://d250qjnmylysl"]
 
 [ext_resource type="Script" uid="uid://8xa4m3nk7dp3" path="res://Entities/Unit/unit.gd" id="1_udu2m"]
+[ext_resource type="Texture2D" uid="uid://10xle2tjjatl" path="res://Entities/Unit/Resources/neutral/neutral_basic.tres" id="2_udu2m"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n3xqk"]
 size = Vector2(16, 16)
@@ -9,6 +10,7 @@ size = Vector2(16, 16)
 script = ExtResource("1_udu2m")
 
 [node name="UnitSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_udu2m")
 centered = false
 
 [node name="UnitCollider" type="CollisionShape2D" parent="."]

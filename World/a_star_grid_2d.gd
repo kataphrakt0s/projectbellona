@@ -14,7 +14,7 @@ const GRID_HEIGHT := 100
 
 var astar := AStarGrid2D.new()
 
-var preview_active := false
+var preview_button_active := false
 var start_cell := Vector2i.ZERO
 var path_cells: Array[Vector2i] = []
 
@@ -36,20 +36,25 @@ func _ready():
 	astar.update()
 	
 	cursor.new_selection.connect(update_start_cell)
-
+	EntityManager.pathfinding_init(self)
 
 func _unhandled_input(event):
 	if event.is_action_pressed("preview_path"):
-		preview_active = true
+		preview_button_active = true
 
-	if event is InputEventMouseButton and event.pressed and preview_active:
+	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			var mouse_world_pos = get_viewport().get_camera_2d().get_global_mouse_position()
-			var clicked_cell = world_to_cell(mouse_world_pos)
-			if astar.is_in_bounds(clicked_cell.x, clicked_cell.y) and EntityManager.current_selection:
-				show_path_preview(start_cell, clicked_cell)
-				preview_active = false
-
+			# Clear previous path sprites on left click regardless of preview active
+			for child in get_children():
+				child.queue_free()
+				
+			if preview_button_active:
+				var mouse_world_pos = get_viewport().get_camera_2d().get_global_mouse_position()
+				var clicked_cell = world_to_cell(mouse_world_pos)
+				if astar.is_in_bounds(clicked_cell.x, clicked_cell.y) and EntityManager.current_selection:
+					show_path_preview(start_cell, clicked_cell)
+					EntityManager.preview_active = true
+					preview_button_active = false
 
 func show_path_preview(from_cell: Vector2i, to_cell: Vector2i) -> void:
 	var id_path = astar.get_id_path(from_cell, to_cell)
@@ -71,27 +76,28 @@ func show_path_preview(from_cell: Vector2i, to_cell: Vector2i) -> void:
 		var sprite = Sprite2D.new()
 		sprite.position = Vector2(cell) * GlobalSettings.GRID_SIZE + Vector2(GlobalSettings.GRID_SIZE / 2, GlobalSettings.GRID_SIZE / 2)
 		
-		if i == 0:
-			# Start pipe - use direction to next cell
-			if path_len > 1:
-				var next_cell = path_cells[i + 1]
-				var dir_next = next_cell - cell
+		# Unused, path starts from adjacent tile
+		#if i == 0:
+			## Start pipe - use direction to next cell
+			#if path_len > 1:
+				#var next_cell = path_cells[i + 1]
+				#var dir_next = next_cell - cell
+				#
+				#if dir_next == Vector2i(1, 0) or dir_next == Vector2i(-1, 0):
+					#sprite.texture = pipe_horizontal
+					#sprite.rotation_degrees = 0
+				#elif dir_next == Vector2i(0, 1) or dir_next == Vector2i(0, -1):
+					#sprite.texture = pipe_vertical
+					#sprite.rotation_degrees = 0
+				#else:
+					#sprite.texture = corner_pipe
+					#sprite.rotation_degrees = 0
+			#else:
+				## Path length 1, just place a horizontal pipe by default
+				#sprite.texture = pipe_horizontal
+				#sprite.rotation_degrees = 0
 				
-				if dir_next == Vector2i(1, 0) or dir_next == Vector2i(-1, 0):
-					sprite.texture = pipe_horizontal
-					sprite.rotation_degrees = 0
-				elif dir_next == Vector2i(0, 1) or dir_next == Vector2i(0, -1):
-					sprite.texture = pipe_vertical
-					sprite.rotation_degrees = 0
-				else:
-					sprite.texture = corner_pipe
-					sprite.rotation_degrees = 0
-			else:
-				# Path length 1, just place a horizontal pipe by default
-				sprite.texture = pipe_horizontal
-				sprite.rotation_degrees = 0
-				
-		elif i == path_len - 1:
+		if i == path_len - 1:
 			# Arrowhead at destination - direction from previous cell
 			var prev_cell = path_cells[i - 1]
 			var dir = cell - prev_cell
@@ -173,8 +179,18 @@ func world_to_cell(world_pos: Vector2) -> Vector2i:
 
 
 func cell_to_world(cell: Vector2i) -> Vector2:
-	return Vector2(cell) * GlobalSettings.GRID_SIZE + Vector2(GlobalSettings.GRID_SIZE / 2, GlobalSettings.GRID_SIZE / 2)
+	return Vector2(cell) * GlobalSettings.GRID_SIZE
 
 func update_start_cell(unit):
 	if unit:
 		start_cell = world_to_cell(unit.global_position)
+
+func get_pathfinding(from_cell: Vector2i, to_cell: Vector2i) -> Array[Vector2i]:
+	if astar.is_in_bounds(from_cell.x, from_cell.y) and astar.is_in_bounds(to_cell.x, to_cell.y):
+		return astar.get_id_path(from_cell, to_cell)
+	return []
+
+func clear_preview():
+	for child in get_children():
+		if child is Sprite2D:
+			child.queue_free()
