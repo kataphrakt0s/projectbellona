@@ -1,10 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://ckbwj7ku1orp3"]
+[gd_scene load_steps=2 format=3 uid="uid://ckbwj7ku1orp3"]
 
 [ext_resource type="Script" uid="uid://dlw57k4wq0wtb" path="res://World/hud.gd" id="1_bo4x5"]
-[ext_resource type="PackedScene" uid="uid://c8ak1u0lbnfx7" path="res://Entities/Cursor/cursor.tscn" id="2_e7my0"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_bo4x5")
-
-[node name="Cursor" parent="." instance=ExtResource("2_e7my0")]
-scale = Vector2(3, 3)
