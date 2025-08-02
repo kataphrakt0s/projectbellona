@@ -16,3 +16,9 @@ centered = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(8, 8)
 shape = SubResource("CircleShape2D_wx0b1")
+
+[node name="CaptureTimer" type="Timer" parent="."]
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="area_exited" from="." to="." method="_on_area_exited"]
+[connection signal="timeout" from="CaptureTimer" to="." method="_on_capture_timer_timeout"]
