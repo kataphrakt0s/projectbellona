@@ -18,6 +18,8 @@ var preview_active := false
 var start_cell := Vector2i.ZERO
 var path_cells: Array[Vector2i] = []
 
+@onready var cursor: Area2D = $"../Cursor"
+
 func _ready():
 	# Setup AStar grid
 	astar.region = Rect2i(Vector2i.ZERO, Vector2i(GRID_WIDTH, GRID_HEIGHT))
@@ -30,8 +32,10 @@ func _ready():
 	for x in range(GRID_WIDTH):
 		for y in range(GRID_HEIGHT):
 			astar.set_point_solid(Vector2i(x, y), false)
-
+	
 	astar.update()
+	
+	cursor.new_selection.connect(update_start_cell)
 
 
 func _unhandled_input(event):
@@ -42,7 +46,7 @@ func _unhandled_input(event):
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			var mouse_world_pos = get_viewport().get_camera_2d().get_global_mouse_position()
 			var clicked_cell = world_to_cell(mouse_world_pos)
-			if astar.is_in_bounds(clicked_cell.x, clicked_cell.y):
+			if astar.is_in_bounds(clicked_cell.x, clicked_cell.y) and EntityManager.current_selection:
 				show_path_preview(start_cell, clicked_cell)
 				preview_active = false
 
@@ -170,3 +174,7 @@ func world_to_cell(world_pos: Vector2) -> Vector2i:
 
 func cell_to_world(cell: Vector2i) -> Vector2:
 	return Vector2(cell) * GlobalSettings.GRID_SIZE + Vector2(GlobalSettings.GRID_SIZE / 2, GlobalSettings.GRID_SIZE / 2)
+
+func update_start_cell(unit):
+	if unit:
+		start_cell = world_to_cell(unit.global_position)

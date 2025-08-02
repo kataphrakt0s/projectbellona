@@ -18,6 +18,3 @@ enum UNITTYPES {
 
 
 var current_selection: Unit = null
-
-func _ready() -> void:
-	pass
