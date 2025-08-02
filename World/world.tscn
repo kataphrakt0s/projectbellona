@@ -61,6 +61,12 @@ team = 0
 unit = 5
 unit_type = 2
 
+[node name="Unit3" parent="Units" instance=ExtResource("3_eidgh")]
+position = Vector2(96, 96)
+team = 1
+unit = 6
+unit_type = 1
+
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
 zoom = Vector2(3, 3)
