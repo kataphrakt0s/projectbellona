@@ -33,13 +33,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				current_selection.movement_confirm = true
 				preview_mode = false
 				selection_allowed = true
-				current_selection.move_unit(clicked_cell)
+				current_selection.move_unit(clicked_cell, current_selection.unit_type)
 			else:
 				# Show preview
 				current_selection.movement_confirm = false
 				EntityManager.path_manager.show_path_preview(
 					EntityManager.path_manager.world_to_cell(current_selection.global_position),
-					clicked_cell
+					clicked_cell,
+					current_selection.unit_type
 				)
 				last_clicked_cell = clicked_cell
 

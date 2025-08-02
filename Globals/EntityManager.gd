@@ -6,7 +6,7 @@ enum TEAMS {
 	NEUTRAL
 }
 
-enum UNITTYPES {
+enum UNITS {
 	BASIC,
 	ROCKET,
 	TRUCK,
@@ -16,7 +16,13 @@ enum UNITTYPES {
 	BOAT
 }
 
-enum STRUCTYPES {
+enum UNITTYPE {
+	LAND,
+	SEA,
+	AIR
+}
+
+enum STRUCTURES {
 	CITY,
 	FORT,
 	AIRBASE,
@@ -30,8 +36,8 @@ var preview_active := false
 func pathfinding_init(pathfinding_node: Node2D):
 	path_manager = pathfinding_node
 
-func set_unit_path(from_cell: Vector2i, to_cell: Vector2i) -> Array[Vector2i]:
-	var path_array: Array[Vector2i] = path_manager.get_pathfinding(from_cell, to_cell)
+func set_land_unit_path(from_cell: Vector2i, to_cell: Vector2i, type: String) -> Array[Vector2i]:
+	var path_array: Array[Vector2i] = path_manager.get_pathfinding_custom(from_cell, to_cell, type)
 	if path_array.size() > 0:
 		return path_array
 	else:

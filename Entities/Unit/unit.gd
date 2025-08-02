@@ -1,7 +1,8 @@
 class_name Unit extends Area2D
 
 @export var team: EntityManager.TEAMS = EntityManager.TEAMS.NEUTRAL
-@export var unit_type: EntityManager.UNITTYPES = EntityManager.UNITTYPES.BASIC
+@export var unit: EntityManager.UNITS = EntityManager.UNITS.BASIC
+@export var unit_type: EntityManager.UNITTYPE = EntityManager.UNITTYPE.LAND
 @export var move_speed := 100.0
 
 signal movement_finished
@@ -18,12 +19,12 @@ func _ready() -> void:
 	# Load correct unit texture based on unit team and type
 	unit_sprite.texture = load(
 		"res://Entities/Unit/Resources/{team}/{team}_{type}.tres".format(
-			{"team": get_enum_name(EntityManager.TEAMS, team).to_lower(), "type": get_enum_name(EntityManager.UNITTYPES, unit_type).to_lower()}
+			{"team": get_enum_name(EntityManager.TEAMS, team).to_lower(), "type": get_enum_name(EntityManager.UNITS, unit).to_lower()}
 		)
 	)
 
 
-func move_unit(to_cell: Vector2i) -> void:
+func move_unit(to_cell: Vector2i, type: EntityManager.UNITTYPE) -> void:
 	if is_moving:
 		return
 		
@@ -32,7 +33,14 @@ func move_unit(to_cell: Vector2i) -> void:
 		return
 		
 	var from_cell = EntityManager.path_manager.world_to_cell(global_position)
-	var path: Array[Vector2i] = EntityManager.set_unit_path(from_cell, to_cell)
+	var path: Array[Vector2i]
+	match type:
+		EntityManager.UNITTYPE.LAND:
+			path = EntityManager.set_land_unit_path(from_cell, to_cell, "Land")
+		EntityManager.UNITTYPE.SEA:
+			path = EntityManager.set_land_unit_path(from_cell, to_cell, "Sea")
+		EntityManager.UNITTYPE.AIR:
+			path = EntityManager.set_land_unit_path(from_cell, to_cell, "Air")
 	
 	if path.size() < 2:
 		return  # already there or no path

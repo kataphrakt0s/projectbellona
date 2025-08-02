@@ -18,6 +18,8 @@ var preview_button_active := false
 var start_cell := Vector2i.ZERO
 var path_cells: Array[Vector2i] = []
 
+@onready var terrain_tilemap: TileMapLayer = $"../Level/TestLevel/Terrain"
+@onready var decor_tilemap: TileMapLayer = $"../Level/TestLevel/Decor"
 @onready var cursor: Area2D = $"../Cursor"
 
 func _ready():
@@ -31,8 +33,15 @@ func _ready():
 	
 	for x in range(GRID_WIDTH):
 		for y in range(GRID_HEIGHT):
-			astar.set_point_solid(Vector2i(x, y), false)
-	
+			var cell = Vector2i(x, y)
+			var cost = get_cell_cost(cell)
+
+			if int(cost) == 999:
+				astar.set_point_solid(cell, true)
+			else:
+				astar.set_point_solid(cell, false)
+				astar.set_point_weight_scale(cell, cost)
+
 	astar.update()
 	
 	cursor.new_selection.connect(update_start_cell)
@@ -52,12 +61,19 @@ func _unhandled_input(event):
 				var mouse_world_pos = get_viewport().get_camera_2d().get_global_mouse_position()
 				var clicked_cell = world_to_cell(mouse_world_pos)
 				if astar.is_in_bounds(clicked_cell.x, clicked_cell.y) and EntityManager.current_selection:
-					show_path_preview(start_cell, clicked_cell)
+					#show_path_preview(start_cell, clicked_cell)
 					EntityManager.preview_active = true
 					preview_button_active = false
 
-func show_path_preview(from_cell: Vector2i, to_cell: Vector2i) -> void:
-	var id_path = astar.get_id_path(from_cell, to_cell)
+func show_path_preview(from_cell: Vector2i, to_cell: Vector2i, unit_type: EntityManager.UNITTYPE) -> void:
+	var id_path
+	match unit_type:
+		EntityManager.UNITTYPE.LAND:
+			id_path = EntityManager.set_land_unit_path(from_cell, to_cell, "Land")
+		EntityManager.UNITTYPE.SEA:
+			id_path = EntityManager.set_land_unit_path(from_cell, to_cell, "Sea")
+		EntityManager.UNITTYPE.AIR:
+			id_path = EntityManager.set_land_unit_path(from_cell, to_cell, "Air")
 	
 	# Clear previous sprites
 	for child in get_children():
@@ -181,16 +197,81 @@ func world_to_cell(world_pos: Vector2) -> Vector2i:
 func cell_to_world(cell: Vector2i) -> Vector2:
 	return Vector2(cell) * GlobalSettings.GRID_SIZE
 
+
 func update_start_cell(unit):
 	if unit:
 		start_cell = world_to_cell(unit.global_position)
 
-func get_pathfinding(from_cell: Vector2i, to_cell: Vector2i) -> Array[Vector2i]:
-	if astar.is_in_bounds(from_cell.x, from_cell.y) and astar.is_in_bounds(to_cell.x, to_cell.y):
-		return astar.get_id_path(from_cell, to_cell)
-	return []
+
+func get_pathfinding_custom(from_cell: Vector2i, to_cell: Vector2i, move_type: String) -> Array[Vector2i]:
+	var astar_custom := AStarGrid2D.new()
+	astar_custom.region = astar.region
+	astar_custom.cell_size = astar.cell_size
+	astar_custom.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	astar_custom.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	astar_custom.update()
+
+	for x in range(GRID_WIDTH):
+		for y in range(GRID_HEIGHT):
+			var cell = Vector2i(x, y)
+			var cost = get_cell_cost_for_type(cell, move_type)
+
+			if int(cost) == 999:
+				astar_custom.set_point_solid(cell, true)
+			else:
+				astar_custom.set_point_solid(cell, false)
+				astar_custom.set_point_weight_scale(cell, cost)
+				
+	astar_custom.update()
+
+	return astar_custom.get_id_path(from_cell, to_cell)
+
+
 
 func clear_preview():
 	for child in get_children():
 		if child is Sprite2D:
 			child.queue_free()
+
+
+func get_cell_cost(cell: Vector2i) -> float:
+	var total_cost := 0.0
+	var solid := false
+
+	for tilemap in [terrain_tilemap, decor_tilemap]:
+		var tile_data = tilemap.get_cell_tile_data(cell)
+		if tile_data:
+			var cost = tile_data.get_custom_data("MoveCostLand")
+			if typeof(cost) == TYPE_INT:
+				if int(cost) == 999:
+					solid = true
+				else:
+					total_cost += float(cost)
+	
+	if solid:
+		return 999.0  # Treat as solid
+	if total_cost > 0:
+		return total_cost
+	return 1.0  # Default base cost if nothing set
+
+func get_cell_cost_for_type(cell: Vector2i, move_type: String) -> float:
+	var total_cost := 0.0
+	var solid := false
+
+	for tilemap in [terrain_tilemap, decor_tilemap]:
+		var tile_data = tilemap.get_cell_tile_data(cell)
+		if tile_data:
+			var key = "MoveCost" + move_type
+			if tile_data.has_custom_data(key):
+				var cost = tile_data.get_custom_data(key)
+				if typeof(cost) == TYPE_INT:
+					if int(cost) == 999:
+						solid = true
+					else:
+						total_cost += float(cost)
+	
+	if solid:
+		return 999.0
+	if total_cost > 0:
+		return total_cost
+	return 1.0
