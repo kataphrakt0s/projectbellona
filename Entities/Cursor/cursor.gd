@@ -16,8 +16,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed):
 			cancel_preview()
 			return
-			
-	if event.is_action("preview_path") and current_selection:
+	
+	if event.is_action("preview_path") and current_selection and event.pressed:
+		if current_selection.team != TurnManager.current_team_turn:
+			print("Not this unit's turn.")
+			return
+		
 		preview_mode = true
 		selection_allowed = false
 		last_clicked_cell = Vector2i(-1, -1)  # reset

@@ -20,9 +20,9 @@ func _ready() -> void:
 		)
 	)
 
-func start_capture(team: EntityManager.TEAMS):
+func start_capture(new_team: EntityManager.TEAMS):
 	capture_timer.start(5)
-	capturing_team = team
+	capturing_team = new_team
 
 func stop_capture():
 	capturing_team = EntityManager.TEAMS.NEUTRAL

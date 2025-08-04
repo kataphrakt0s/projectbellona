@@ -34,13 +34,7 @@ func _ready():
 	for x in range(GRID_WIDTH):
 		for y in range(GRID_HEIGHT):
 			var cell = Vector2i(x, y)
-			var cost = get_cell_cost(cell)
-
-			if int(cost) == 999:
-				astar.set_point_solid(cell, true)
-			else:
-				astar.set_point_solid(cell, false)
-				astar.set_point_weight_scale(cell, cost)
+			astar.set_point_solid(cell, false)
 
 	astar.update()
 	
@@ -69,11 +63,11 @@ func show_path_preview(from_cell: Vector2i, to_cell: Vector2i, unit_type: Entity
 	var id_path
 	match unit_type:
 		EntityManager.UNITTYPE.LAND:
-			id_path = EntityManager.set_land_unit_path(from_cell, to_cell, "Land")
+			id_path = EntityManager.set_unit_path(from_cell, to_cell, "Land")
 		EntityManager.UNITTYPE.SEA:
-			id_path = EntityManager.set_land_unit_path(from_cell, to_cell, "Sea")
+			id_path = EntityManager.set_unit_path(from_cell, to_cell, "Sea")
 		EntityManager.UNITTYPE.AIR:
-			id_path = EntityManager.set_land_unit_path(from_cell, to_cell, "Air")
+			id_path = EntityManager.set_unit_path(from_cell, to_cell, "Air")
 	
 	# Clear previous sprites
 	for child in get_children():
@@ -233,26 +227,26 @@ func clear_preview():
 		if child is Sprite2D:
 			child.queue_free()
 
-
-func get_cell_cost(cell: Vector2i) -> float:
-	var total_cost := 0.0
-	var solid := false
-
-	for tilemap in [terrain_tilemap, decor_tilemap]:
-		var tile_data = tilemap.get_cell_tile_data(cell)
-		if tile_data:
-			var cost = tile_data.get_custom_data("MoveCostLand")
-			if typeof(cost) == TYPE_INT:
-				if int(cost) == 999:
-					solid = true
-				else:
-					total_cost += float(cost)
-	
-	if solid:
-		return 999.0  # Treat as solid
-	if total_cost > 0:
-		return total_cost
-	return 1.0  # Default base cost if nothing set
+# Deprecated, use get_cell_cost_for_type()
+#func get_cell_cost(cell: Vector2i) -> float:
+	#var total_cost := 0.0
+	#var solid := false
+#
+	#for tilemap in [terrain_tilemap, decor_tilemap]:
+		#var tile_data = tilemap.get_cell_tile_data(cell)
+		#if tile_data:
+			#var cost = tile_data.get_custom_data("MoveCostLand")
+			#if typeof(cost) == TYPE_INT:
+				#if int(cost) == 999:
+					#solid = true
+				#else:
+					#total_cost += float(cost)
+	#
+	#if solid:
+		#return 999.0  # Treat as solid
+	#if total_cost > 0:
+		#return total_cost
+	#return 1.0  # Default base cost if nothing set
 
 func get_cell_cost_for_type(cell: Vector2i, move_type: String) -> float:
 	var total_cost := 0.0
