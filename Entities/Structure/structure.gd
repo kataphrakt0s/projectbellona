@@ -8,6 +8,7 @@ signal captured(team: EntityManager.TEAMS)
 @export var unit_to_spawn: EntityManager.UNITS = EntityManager.UNITS.ROCKET
 
 var capturing_team: EntityManager.TEAMS = EntityManager.TEAMS.NEUTRAL
+var spawned_this_turn := false
 
 @onready var structure_sprite := $StructureSprite
 @onready var capture_timer := $CaptureTimer
@@ -15,6 +16,7 @@ var capturing_team: EntityManager.TEAMS = EntityManager.TEAMS.NEUTRAL
 
 func _ready() -> void:
 	self.add_to_group("Structures")
+	TurnManager.turn_ended.connect(turn_ended)
 	
 	# Load correct unit texture based on unit team and type
 	structure_sprite.texture = load(
@@ -28,10 +30,11 @@ func _ready() -> void:
 	_set_spawn_sprite_position()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action("spawn_unit") and event.pressed:
+	if event.is_action("spawn_unit") and event.pressed and not spawned_this_turn:
 		if %Cursor.current_selection != self:
 			return
 		print("Spawning unit")
+		spawned_this_turn = true
 		spawn_unit()
 
 
@@ -95,6 +98,9 @@ func _on_area_entered(area: Area2D) -> void:
 func _on_area_exited(area: Area2D) -> void:
 	if area.is_in_group("Units"):
 		stop_capture()
+
+func turn_ended(prev_team, current_team) -> void:
+	spawned_this_turn = false
 
 # Helpers
 func get_enum_name(enum_dict: Dictionary, value: int) -> String:
