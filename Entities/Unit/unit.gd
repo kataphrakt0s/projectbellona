@@ -1,10 +1,9 @@
-class_name Unit
-extends Area2D
+class_name Unit extends Area2D
 
 @export var team: EntityManager.TEAMS = EntityManager.TEAMS.NEUTRAL
 @export var unit_data: UnitData
-@export var attack_range_color: Color = Color(1, 0, 0, 0.5) # semi-transparent red for attack range
-@export var center_color = Color(1, 1, 1, 0.5)  # semi-transparent white for center cell
+@export var attack_range_color: Color = Color(1, 0, 0, 0.3) # semi-transparent red for attack range
+@export var center_color = Color(1, 1, 1, 0.0)  # transparent for center cell
 
 signal movement_finished
 
@@ -33,7 +32,7 @@ func _ready() -> void:
 		})
 	)
 	
-	path_manager = %PathManager
+	path_manager = get_node("../../PathManager")
 	
 	# Add the overlay node to this unit for drawing range
 	add_child(attack_range_overlay)
@@ -86,6 +85,11 @@ func reset_movement_points() -> void:
 	current_move_points = unit_data.max_move_points
 
 
+func turn_ended(previous_team, _current_team) -> void:
+	if previous_team == team:
+		hide_attack_range()
+
+
 # Helpers
 func get_enum_name(enum_dict: Dictionary, value: int) -> String:
 	for enum_name in enum_dict.keys():
@@ -114,7 +118,7 @@ func show_attack_range() -> void:
 				var rect = ColorRect.new()
 
 				if x_offset == 0 and y_offset == 0:
-					rect.color = Color(1, 1, 1, 0.5)  # center square
+					rect.color = center_color  # center square
 				else:
 					rect.color = attack_range_color
 
@@ -140,10 +144,6 @@ func toggle_attack_range() -> void:
 	else:
 		hide_attack_range()
 
-
-func turn_ended(previous_team, _current_team) -> void:
-	if previous_team == team:
-		hide_attack_range()
 
 func get_attackable_cells() -> Array[Vector2i]:
 	var attack_range = unit_data.attack_range

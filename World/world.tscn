@@ -60,7 +60,7 @@ position = Vector2(64, 48)
 unit_data = ExtResource("5_w47uh")
 
 [node name="Unit4" parent="Units" instance=ExtResource("3_eidgh")]
-position = Vector2(48, 64)
+position = Vector2(112, 16)
 team = 0
 unit_data = ExtResource("5_w47uh")
 

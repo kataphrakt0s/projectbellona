@@ -57,8 +57,8 @@ func _unhandled_input(event):
 				preview_button_active = false
 
 
-func update_start_cell(unit: Unit) -> void:
-	if unit:
+func update_start_cell(unit: Node) -> void:
+	if unit and unit is Unit:
 		current_selection = unit
 		start_cell = world_to_cell(unit.global_position)
 

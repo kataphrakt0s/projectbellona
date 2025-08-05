@@ -30,7 +30,7 @@ enum STRUCTURES {
 	PORT
 }
 
-var current_selection: Unit = null
+var current_selection: Node = null
 var path_manager: PathManager
 
 
@@ -42,10 +42,12 @@ func request_path(from_cell: Vector2i, to_cell: Vector2i, unit_type: UNITTYPE) -
 	if current_selection == null or current_selection.team != TurnManager.current_team_turn:
 		print("It's not this unit's turn.")
 		return []
-
-	var move_limit := current_selection.current_move_points
-	var move_type := unit_type_to_string(unit_type)
-	return path_manager.get_unit_path(from_cell, to_cell, move_type, move_limit)
+	if current_selection is Unit:
+		var move_limit = current_selection.current_move_points
+		var move_type := unit_type_to_string(unit_type)
+		return path_manager.get_unit_path(from_cell, to_cell, move_type, move_limit)
+	print("Must be a Unit to get a path")
+	return []
 
 func unit_type_to_string(unit_type: UNITTYPE) -> String:
 	match unit_type:

@@ -1,10 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://b21cuef348jqp"]
+[gd_scene load_steps=6 format=3 uid="uid://b21cuef348jqp"]
 
 [ext_resource type="Script" uid="uid://crphdl2kvof23" path="res://Entities/Structure/structure.gd" id="1_bo6q4"]
 [ext_resource type="Texture2D" uid="uid://clu5vjxea6hl8" path="res://Entities/Structure/Resources/neutral/neutral_fort.tres" id="2_bo6q4"]
+[ext_resource type="Texture2D" uid="uid://vno07ukcvy1t" path="res://Assets/tilemap.png" id="3_wcv2g"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_wx0b1"]
-radius = 8.0
+radius = 7.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tyd6l"]
+atlas = ExtResource("3_wcv2g")
+region = Rect2(119, 68, 16, 16)
 
 [node name="Structure" type="Area2D"]
 script = ExtResource("1_bo6q4")
@@ -23,6 +28,11 @@ one_shot = true
 [node name="SpawnPoint" type="Marker2D" parent="."]
 position = Vector2(16, 0)
 gizmo_extents = 8.0
+
+[node name="SpawnAreaSprite" type="Sprite2D" parent="."]
+position = Vector2(16, 0)
+texture = SubResource("AtlasTexture_tyd6l")
+centered = false
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="area_exited" from="." to="." method="_on_area_exited"]

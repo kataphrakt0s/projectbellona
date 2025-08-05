@@ -1,13 +1,15 @@
 class_name Cursor extends Area2D
 
-signal new_selection(unit)
+signal new_selection(unit: Node)
 
 var move_preview_mode := false
 var attack_preview_mode := false
 var last_clicked_cell: Vector2i = Vector2i(-1, -1)
-var current_selection: Unit = null
 var selection_allowed := true
+var current_selection: Node = null # Changed from Unit to Node
 var selected_target: Unit = null
+var selected_structure: Structure = null # Add this
+
 
 
 @onready var cursor_collider: CollisionShape2D = $CursorCollider
@@ -56,7 +58,7 @@ func _handle_preview_path_input(event: InputEvent) -> bool:
 
 
 func _handle_preview_attack_input(event: InputEvent) -> bool:
-	if event.is_action("preview_attack") and current_selection and event.pressed:
+	if event.is_action("preview_attack") and current_selection and event.pressed and current_selection is Unit:
 		if current_selection.team != TurnManager.current_team_turn:
 			print("Not this unit's turn.")
 			return true
@@ -77,7 +79,7 @@ func _handle_left_click_input(event: InputEvent) -> bool:
 		var mouse_pos = get_viewport().get_camera_2d().get_global_mouse_position()
 		var clicked_cell = Vector2i((mouse_pos / GlobalSettings.GRID_SIZE).floor())
 		position = clicked_cell * GlobalSettings.GRID_SIZE
-
+		
 		if move_preview_mode and current_selection:
 			return _handle_move_preview(clicked_cell)
 
@@ -85,25 +87,27 @@ func _handle_left_click_input(event: InputEvent) -> bool:
 			return _handle_attack_preview(mouse_pos, clicked_cell)
 
 		if selection_allowed and not move_preview_mode and not attack_preview_mode:
-			return _handle_unit_selection(mouse_pos)
+			return _handle_entity_selection(mouse_pos)
 
 	return false
 
 
-
 func _on_turn_started(_current_team: EntityManager.TEAMS) -> void:
 	clear_selection()
+	cancel_attack_preview()
+	cancel_move_preview()
 
 
 func clear_selection():
-	if current_selection:
+	if current_selection and current_selection is Unit:
 		current_selection.attack_range_visible = false
 		current_selection.hide_attack_range()
-		EntityManager.current_selection = null
-		new_selection.emit(null)
 
 	current_selection = null
+	selected_structure = null
 	selected_target = null
+	EntityManager.current_selection = null
+	new_selection.emit(null)
 
 
 func cancel_move_preview():
@@ -123,6 +127,7 @@ func cancel_attack_preview():
 		selected_target = null
 		if current_selection:
 			current_selection.hide_attack_range()
+
 
 func _handle_move_preview(clicked_cell: Vector2i) -> bool:
 	if clicked_cell == last_clicked_cell:
@@ -149,8 +154,8 @@ func _handle_attack_preview(mouse_pos: Vector2, clicked_cell: Vector2i) -> bool:
 	if clicked_cell == last_clicked_cell and selected_target:
 		current_selection.attack_confirm = true
 
-		var target_cell = Vector2i((selected_target.global_position / GlobalSettings.GRID_SIZE).floor())
-		var in_range := current_selection.get_attackable_cells().has(target_cell)
+		var target_cell := Vector2i((selected_target.global_position / GlobalSettings.GRID_SIZE).floor())
+		var in_range = current_selection.get_attackable_cells().has(target_cell)
 
 		if in_range:
 			print("Target is in range. Attacking.")
@@ -172,8 +177,10 @@ func _handle_attack_preview(mouse_pos: Vector2, clicked_cell: Vector2i) -> bool:
 	return true
 
 
-func _handle_unit_selection(mouse_pos: Vector2) -> bool:
+func _handle_entity_selection(mouse_pos: Vector2) -> bool:
 	var selected := false
+
+	# Check for Unit selection
 	for unit in get_tree().get_nodes_in_group("Units"):
 		if unit.team == TurnManager.current_team_turn and unit.get_global_rect().has_point(mouse_pos):
 			if current_selection != unit:
@@ -185,6 +192,20 @@ func _handle_unit_selection(mouse_pos: Vector2) -> bool:
 			selected = true
 			break
 
+	# Check for Structure selection only if no unit was selected
+	if not selected:
+		for structure in get_tree().get_nodes_in_group("Structures"):
+			if structure.team == TurnManager.current_team_turn and structure.get_global_rect().has_point(mouse_pos):
+				if current_selection != structure:
+					clear_selection()
+				current_selection = structure
+				selected_structure = structure
+				new_selection.emit(structure)
+				print("Structure selected:", structure)
+				selected = true
+				break
+
 	if not selected:
 		clear_selection()
+
 	return true

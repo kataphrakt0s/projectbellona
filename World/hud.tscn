@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://ckbwj7ku1orp3"]
+[gd_scene load_steps=8 format=3 uid="uid://ckbwj7ku1orp3"]
 
 [ext_resource type="Script" uid="uid://dlw57k4wq0wtb" path="res://World/hud.gd" id="1_bo4x5"]
 [ext_resource type="Texture2D" uid="uid://ciyxr4i2hnn16" path="res://Assets/InputPrompts/keyboard_x.png" id="2_e7my0"]
 [ext_resource type="Texture2D" uid="uid://dspwqavq84g5u" path="res://Assets/InputPrompts/keyboard_z.png" id="2_n4qfh"]
 [ext_resource type="Texture2D" uid="uid://bpj5ctwct3o4j" path="res://Assets/InputPrompts/keyboard_v.png" id="3_065ju"]
 [ext_resource type="Texture2D" uid="uid://dw41awooxdlle" path="res://Assets/InputPrompts/mouse_left.png" id="3_pqfo2"]
+[ext_resource type="Texture2D" uid="uid://c56ecdkeedd0c" path="res://Assets/InputPrompts/keyboard_c.png" id="4_4wi3s"]
 [ext_resource type="Texture2D" uid="uid://c5gjomy847esc" path="res://Assets/InputPrompts/mouse_right.png" id="4_065ju"]
 
 [node name="HUD" type="CanvasLayer"]
@@ -49,29 +50,46 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="AttackButton" type="TextureRect" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("2_n4qfh")
 stretch_mode = 5
 
 [node name="AttackLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Attack"
 
 [node name="MoveButton" type="TextureRect" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("2_e7my0")
 stretch_mode = 5
 
 [node name="MoveLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Move"
 
+[node name="SpawnButton" type="TextureRect" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("4_4wi3s")
+stretch_mode = 5
+
+[node name="SpawnLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Spawn Unit"
+
 [node name="EndTurnButton" type="TextureRect" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 texture = ExtResource("3_065ju")
 stretch_mode = 5
 
 [node name="EndTurnLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar/InputPrompts/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "End Turn"
 
