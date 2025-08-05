@@ -6,9 +6,9 @@ var move_preview_mode := false
 var attack_preview_mode := false
 var last_clicked_cell: Vector2i = Vector2i(-1, -1)
 var selection_allowed := true
-var current_selection: Node = null # Changed from Unit to Node
+var current_selection: Node = null
 var selected_target: Unit = null
-var selected_structure: Structure = null # Add this
+var selected_structure: Structure = null
 
 
 

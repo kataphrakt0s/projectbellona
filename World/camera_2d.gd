@@ -1,9 +1,9 @@
 extends Camera2D
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	zoom = GlobalSettings.ZOOM_FACTOR
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _handle_camera_movement(event):
