@@ -37,9 +37,6 @@ func end_turn() -> void:
 			current_team_turn = next_team
 			break
 	
-	EntityManager.current_selection = null
-	EntityManager.preview_active = false
-	
 	_reset_team_movement(current_team_turn)
 	turn_ended.emit(previous_team, current_team_turn)
 	turn_started.emit(current_team_turn)

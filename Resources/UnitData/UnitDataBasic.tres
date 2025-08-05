@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://cdrdhshb0qsbh"]
+
+[ext_resource type="Script" uid="uid://dra1cir1pu3ox" path="res://Resources/UnitData/UnitData.gd" id="1_53aet"]
+
+[resource]
+script = ExtResource("1_53aet")
+display_name = "Basic"
+unit = 0
+unit_type = 0
+max_move_points = 3
+move_speed = 100.0
+attack_power = 3
+description = "Basic ground unit."
+metadata/_custom_type_script = "uid://dra1cir1pu3ox"

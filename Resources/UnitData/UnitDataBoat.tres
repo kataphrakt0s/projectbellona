@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://blr34aceeejhc"]
+
+[ext_resource type="Script" uid="uid://dra1cir1pu3ox" path="res://Resources/UnitData/UnitData.gd" id="1_16ybi"]
+
+[resource]
+script = ExtResource("1_16ybi")
+display_name = "Boat"
+unit = 6
+unit_type = 1
+max_move_points = 4
+move_speed = 100.0
+attack_power = 5
+attack_range = 2
+description = "Basic patrol boat."
+metadata/_custom_type_script = "uid://dra1cir1pu3ox"

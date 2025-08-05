@@ -18,6 +18,11 @@ position = Vector2(8, 8)
 shape = SubResource("CircleShape2D_wx0b1")
 
 [node name="CaptureTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="SpawnPoint" type="Marker2D" parent="."]
+position = Vector2(16, 0)
+gizmo_extents = 8.0
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
 [connection signal="area_exited" from="." to="." method="_on_area_exited"]

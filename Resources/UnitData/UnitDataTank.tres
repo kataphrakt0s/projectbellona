@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://e3cedga3gmfi"]
+
+[ext_resource type="Script" uid="uid://dra1cir1pu3ox" path="res://Resources/UnitData/UnitData.gd" id="1_l5tu1"]
+
+[resource]
+script = ExtResource("1_l5tu1")
+display_name = "Tank"
+unit = 3
+unit_type = 0
+max_move_points = 4
+move_speed = 100.0
+attack_power = 7
+attack_range = 3
+description = "Mechanized heavy cavalry."
+metadata/_custom_type_script = "uid://dra1cir1pu3ox"

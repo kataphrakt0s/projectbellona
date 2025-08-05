@@ -4,11 +4,13 @@ signal captured(team: EntityManager.TEAMS)
 
 @export var team: EntityManager.TEAMS = EntityManager.TEAMS.NEUTRAL
 @export var structure_type: EntityManager.STRUCTURES = EntityManager.STRUCTURES.FORT
+@export var spawn_direction: int = 0 # 0 for right, 1 for down, 2 for left, 3 for up
 
 var capturing_team: EntityManager.TEAMS = EntityManager.TEAMS.NEUTRAL
 
 @onready var structure_sprite := $StructureSprite
 @onready var capture_timer := $CaptureTimer
+@onready var spawn_point := $SpawnPoint
 
 func _ready() -> void:
 	self.add_to_group("Structures")
@@ -19,12 +21,16 @@ func _ready() -> void:
 			{"team": get_enum_name(EntityManager.TEAMS, team).to_lower(), "type": get_enum_name(EntityManager.STRUCTURES, structure_type).to_lower()}
 		)
 	)
+	
+	_set_spawn_point_position()
 
-func start_capture(new_team: EntityManager.TEAMS):
+func start_capture(new_team: EntityManager.TEAMS) -> void:
+	if new_team	== team:
+		return
 	capture_timer.start(5)
 	capturing_team = new_team
 
-func stop_capture():
+func stop_capture() -> void:
 	capturing_team = EntityManager.TEAMS.NEUTRAL
 	capture_timer.stop()
 
@@ -44,7 +50,8 @@ func _on_capture_timer_timeout() -> void:
 
 func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group("Units"):
-		start_capture(area.team)
+		if area.unit_type == EntityManager.UNITTYPE.LAND:
+			start_capture(area.team)
 
 func _on_area_exited(area: Area2D) -> void:
 	if area.is_in_group("Units"):
@@ -56,3 +63,16 @@ func get_enum_name(enum_dict: Dictionary, value: int) -> String:
 		if enum_dict[enum_name] == value:
 			return enum_name
 	return "UNKNOWN"
+	
+func _set_spawn_point_position() -> void:
+	match spawn_direction:
+		0: # Right
+			spawn_point.position = Vector2(GlobalSettings.GRID_SIZE, 0)
+		1: # Down
+			spawn_point.position = Vector2(0, GlobalSettings.GRID_SIZE)
+		2: # Left
+			spawn_point.position = Vector2(-GlobalSettings.GRID_SIZE, 0)
+		3: # Up
+			spawn_point.position = Vector2(0, -GlobalSettings.GRID_SIZE)
+		_:
+			spawn_point.position = Vector2.ZERO

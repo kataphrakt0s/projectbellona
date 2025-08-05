@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://biuqh5v8inpkb"]
+[gd_scene load_steps=20 format=3 uid="uid://biuqh5v8inpkb"]
 
 [ext_resource type="Script" uid="uid://ck05i5cxi82uj" path="res://World/world.gd" id="1_3f78f"]
 [ext_resource type="PackedScene" uid="uid://b7iw14nobde70" path="res://World/Levels/test_level.tscn" id="1_8a836"]
@@ -7,8 +7,11 @@
 [ext_resource type="PackedScene" uid="uid://d250qjnmylysl" path="res://Entities/Unit/unit.tscn" id="3_eidgh"]
 [ext_resource type="PackedScene" uid="uid://b21cuef348jqp" path="res://Entities/Structure/structure.tscn" id="3_oe8m4"]
 [ext_resource type="PackedScene" uid="uid://c8ak1u0lbnfx7" path="res://Entities/Cursor/cursor.tscn" id="4_bkhv4"]
-[ext_resource type="Script" uid="uid://un3ghtcemwg5" path="res://World/a_star_grid_2d.gd" id="5_k8do8"]
+[ext_resource type="Resource" uid="uid://cdrdhshb0qsbh" path="res://Resources/UnitData/UnitDataBasic.tres" id="5_w47uh"]
+[ext_resource type="Resource" uid="uid://dgbpm4jyf4g0f" path="res://Resources/UnitData/UnitDataPlane.tres" id="6_lo5ox"]
+[ext_resource type="Resource" uid="uid://blr34aceeejhc" path="res://Resources/UnitData/UnitDataBoat.tres" id="7_h2aik"]
 [ext_resource type="Texture2D" uid="uid://vno07ukcvy1t" path="res://Assets/tilemap.png" id="7_yf0ba"]
+[ext_resource type="Script" uid="uid://bkd4mj1c8cwei" path="res://World/PathManager.gd" id="8_oe8m4"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yf0ba"]
 atlas = ExtResource("7_yf0ba")
@@ -54,18 +57,22 @@ position = Vector2(128, 16)
 
 [node name="Unit" parent="Units" instance=ExtResource("3_eidgh")]
 position = Vector2(64, 48)
+unit_data = ExtResource("5_w47uh")
+
+[node name="Unit4" parent="Units" instance=ExtResource("3_eidgh")]
+position = Vector2(48, 64)
+team = 0
+unit_data = ExtResource("5_w47uh")
 
 [node name="Unit2" parent="Units" instance=ExtResource("3_eidgh")]
 position = Vector2(32, 32)
 team = 0
-unit = 5
-unit_type = 2
+unit_data = ExtResource("6_lo5ox")
 
 [node name="Unit3" parent="Units" instance=ExtResource("3_eidgh")]
 position = Vector2(96, 96)
 team = 1
-unit = 6
-unit_type = 1
+unit_data = ExtResource("7_h2aik")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
@@ -73,12 +80,13 @@ zoom = Vector2(3, 3)
 script = ExtResource("2_j8job")
 
 [node name="Cursor" parent="." instance=ExtResource("4_bkhv4")]
+unique_name_in_owner = true
 
 [node name="HUD" parent="." instance=ExtResource("1_62w18")]
 
-[node name="AStarGrid2D" type="Node2D" parent="."]
+[node name="PathManager" type="Node2D" parent="."]
 unique_name_in_owner = true
-script = ExtResource("5_k8do8")
+script = ExtResource("8_oe8m4")
 arrowhead_up = SubResource("AtlasTexture_yf0ba")
 arrowhead_down = SubResource("AtlasTexture_eidgh")
 arrowhead_left = SubResource("AtlasTexture_oe8m4")
