@@ -99,7 +99,7 @@ func _on_area_exited(area: Area2D) -> void:
 	if area.is_in_group("Units"):
 		stop_capture()
 
-func turn_ended(prev_team, current_team) -> void:
+func turn_ended(_prev_team, _current_team) -> void:
 	spawned_this_turn = false
 
 # Helpers
