@@ -10,6 +10,7 @@ signal movement_finished
 
 var is_moving := false
 var movement_confirm := false
+var attack_confirm := false
 var path_manager: PathManager
 var attack_range_visible := false
 var current_move_points: int:
@@ -38,7 +39,7 @@ func _ready() -> void:
 	add_child(attack_range_overlay)
 	attack_range_overlay.z_index = 1000  # ensure it is drawn above unit sprite
 	TurnManager.turn_ended.connect(turn_ended)
-	#draw_attack_range()
+
 
 func move_unit(to_cell: Vector2i, type: EntityManager.UNITTYPE) -> void:
 	if is_moving or not movement_confirm:
@@ -76,8 +77,14 @@ func move_unit(to_cell: Vector2i, type: EntityManager.UNITTYPE) -> void:
 	movement_confirm = false
 	movement_finished.emit()
 
+
+func attack(unit_to_attack: Unit) -> void:
+	print("{self} attacked {target}".format({"self": self, "target": unit_to_attack}))
+
+
 func reset_movement_points() -> void:
 	current_move_points = unit_data.max_move_points
+
 
 # Helpers
 func get_enum_name(enum_dict: Dictionary, value: int) -> String:
@@ -85,22 +92,23 @@ func get_enum_name(enum_dict: Dictionary, value: int) -> String:
 		if enum_dict[enum_name] == value:
 			return enum_name
 	return "UNKNOWN"
-	
+
+
 func show_attack_range() -> void:
 	# Clear previous range markers
 	for child in attack_range_overlay.get_children():
 		child.queue_free()
 
-	var range = unit_data.attack_range
+	var attack_range = unit_data.attack_range
 	var cell_size = GlobalSettings.GRID_SIZE
 
 	# Center the overlay on the unit
 	attack_range_overlay.position = Vector2.ZERO
 
-	for x_offset in range(-range, range + 1):
-		for y_offset in range(-range, range + 1):
+	for x_offset in range(-attack_range, attack_range + 1):
+		for y_offset in range(-attack_range, attack_range + 1):
 			var dist = abs(x_offset) + abs(y_offset)  # Manhattan distance
-			if dist <= range:
+			if dist <= attack_range:
 				var offset_pos = Vector2(x_offset * cell_size, y_offset * cell_size)
 
 				var rect = ColorRect.new()
@@ -119,9 +127,11 @@ func show_attack_range() -> void:
 
 				attack_range_overlay.add_child(range_marker)
 
+
 func hide_attack_range() -> void:
 	for child in attack_range_overlay.get_children():
 		child.queue_free()
+
 
 func toggle_attack_range() -> void:
 	attack_range_visible = !attack_range_visible
@@ -131,6 +141,27 @@ func toggle_attack_range() -> void:
 		hide_attack_range()
 
 
-func turn_ended(previous_team, current_team) -> void:
+func turn_ended(previous_team, _current_team) -> void:
 	if previous_team == team:
 		hide_attack_range()
+
+func get_attackable_cells() -> Array[Vector2i]:
+	var attack_range = unit_data.attack_range
+	var attackable_cells: Array[Vector2i] = []
+
+	var unit_cell = path_manager.world_to_cell(global_position)
+
+	for x_offset in range(-attack_range, attack_range + 1):
+		for y_offset in range(-attack_range, attack_range + 1):
+			var dist = abs(x_offset) + abs(y_offset)
+			if dist <= attack_range:
+				var cell = unit_cell + Vector2i(x_offset, y_offset)
+				attackable_cells.append(cell)
+
+	return attackable_cells
+
+
+func get_global_rect() -> Rect2:
+	var size := Vector2(GlobalSettings.GRID_SIZE, GlobalSettings.GRID_SIZE)
+	var global_pos := global_position
+	return Rect2(global_pos, size)

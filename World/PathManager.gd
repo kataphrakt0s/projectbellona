@@ -40,6 +40,7 @@ func _ready():
 	cursor.new_selection.connect(update_start_cell)
 	TurnManager.turn_started.connect(_on_turn_started)
 
+
 func _unhandled_input(event):
 	if event.is_action_pressed("preview_path"):
 		preview_button_active = true

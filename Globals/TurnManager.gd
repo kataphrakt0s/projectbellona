@@ -9,12 +9,12 @@ var current_team_turn: EntityManager.TEAMS = EntityManager.TEAMS.RED
 
 var team_order: Array[EntityManager.TEAMS] = [
 	EntityManager.TEAMS.RED,
-	EntityManager.TEAMS.BLUE
+	EntityManager.TEAMS.BLUE,
 ]
 
 var team_active: Dictionary = {
 	EntityManager.TEAMS.RED: true,
-	EntityManager.TEAMS.BLUE: true
+	EntityManager.TEAMS.BLUE: true,
 }
 
 func _ready() -> void:

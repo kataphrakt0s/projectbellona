@@ -1,4 +1,4 @@
-class_name Cursor extends Node2D
+class_name Cursor extends Area2D
 
 signal new_selection(unit)
 
@@ -7,8 +7,10 @@ var attack_preview_mode := false
 var last_clicked_cell: Vector2i = Vector2i(-1, -1)
 var current_selection: Unit = null
 var selection_allowed := true
+var selected_target: Unit = null
 
-@onready var cursor_collider := $CursorCollider
+
+@onready var cursor_collider: CollisionShape2D = $CursorCollider
 
 
 func _ready() -> void:
@@ -77,50 +79,31 @@ func _handle_left_click_input(event: InputEvent) -> bool:
 		position = clicked_cell * GlobalSettings.GRID_SIZE
 
 		if move_preview_mode and current_selection:
-			if clicked_cell == last_clicked_cell:
-				current_selection.movement_confirm = true
-				move_preview_mode = false
-				selection_allowed = true
-				current_selection.move_unit(clicked_cell, current_selection.unit_data.unit_type)
-			else:
-				current_selection.movement_confirm = false
-				EntityManager.path_manager.show_path_preview(
-					EntityManager.path_manager.world_to_cell(current_selection.global_position),
-					clicked_cell,
-					current_selection.unit_data.unit_type
-				)
-				last_clicked_cell = clicked_cell
-			return true
+			return _handle_move_preview(clicked_cell)
+
+		if attack_preview_mode and current_selection:
+			return _handle_attack_preview(mouse_pos, clicked_cell)
+
+		if selection_allowed and not move_preview_mode and not attack_preview_mode:
+			return _handle_unit_selection(mouse_pos)
+
 	return false
+
 
 
 func _on_turn_started(_current_team: EntityManager.TEAMS) -> void:
 	clear_selection()
 
 
-func _on_area_entered(area: Area2D) -> void:
-	if area.is_in_group("Units") and selection_allowed:
-		print("New unit selected")
-		EntityManager.current_selection = area
-		new_selection.emit(area)
-		current_selection = area
-
-
-func _on_area_exited(_area: Area2D) -> void:
-	if move_preview_mode or attack_preview_mode:
-		return  # Block deselection during previews
-
-	if current_selection is Unit and selection_allowed:
-		print("Unit deselected")
+func clear_selection():
+	if current_selection:
 		current_selection.attack_range_visible = false
 		current_selection.hide_attack_range()
 		EntityManager.current_selection = null
 		new_selection.emit(null)
-		current_selection = null
 
-
-func clear_selection():
 	current_selection = null
+	selected_target = null
 
 
 func cancel_move_preview():
@@ -137,5 +120,71 @@ func cancel_attack_preview():
 		print("Attack preview mode canceled.")
 		attack_preview_mode = false
 		selection_allowed = true
+		selected_target = null
 		if current_selection:
 			current_selection.hide_attack_range()
+
+func _handle_move_preview(clicked_cell: Vector2i) -> bool:
+	if clicked_cell == last_clicked_cell:
+		for unit in get_tree().get_nodes_in_group("Units"):
+			if unit != current_selection and EntityManager.path_manager.world_to_cell(unit.global_position) == clicked_cell:
+				print("Cell is occupied by another unit.")
+				return true
+
+		current_selection.movement_confirm = true
+		cancel_move_preview()
+		current_selection.move_unit(clicked_cell, current_selection.unit_data.unit_type)
+	else:
+		current_selection.movement_confirm = false
+		EntityManager.path_manager.show_path_preview(
+			EntityManager.path_manager.world_to_cell(current_selection.global_position),
+			clicked_cell,
+			current_selection.unit_data.unit_type
+		)
+		last_clicked_cell = clicked_cell
+	return true
+
+
+func _handle_attack_preview(mouse_pos: Vector2, clicked_cell: Vector2i) -> bool:
+	if clicked_cell == last_clicked_cell and selected_target:
+		current_selection.attack_confirm = true
+
+		var target_cell = Vector2i((selected_target.global_position / GlobalSettings.GRID_SIZE).floor())
+		var in_range := current_selection.get_attackable_cells().has(target_cell)
+
+		if in_range:
+			print("Target is in range. Attacking.")
+			current_selection.attack(selected_target)
+			cancel_attack_preview()
+		else:
+			print("Target is out of range.")
+	else:
+		current_selection.attack_confirm = false
+		last_clicked_cell = clicked_cell
+
+		# Attempt to select a new enemy target
+		for unit in get_tree().get_nodes_in_group("Units"):
+			if unit != current_selection and unit.team != current_selection.team and unit.get_global_rect().has_point(mouse_pos):
+				selected_target = unit
+				print("Selected target for attack:", unit)
+				break
+
+	return true
+
+
+func _handle_unit_selection(mouse_pos: Vector2) -> bool:
+	var selected := false
+	for unit in get_tree().get_nodes_in_group("Units"):
+		if unit.team == TurnManager.current_team_turn and unit.get_global_rect().has_point(mouse_pos):
+			if current_selection != unit:
+				clear_selection()
+			current_selection = unit
+			EntityManager.current_selection = unit
+			new_selection.emit(unit)
+			print("New unit selected:", unit)
+			selected = true
+			break
+
+	if not selected:
+		clear_selection()
+	return true
